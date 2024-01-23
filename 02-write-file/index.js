@@ -12,7 +12,7 @@ function byeFunc() {
 }
 
 process.stdin.on('data', function (data) {
-  if (data.toString().trim() === 'exit') {
+  if (data.toString().toLowerCase().trim() === 'exit') {
     byeFunc();
   }
   writeStream.write(data);
