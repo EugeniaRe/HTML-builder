@@ -8,7 +8,7 @@ fs.readdir(pathToFolder, { withFileTypes: true }, (err, files) => {
       if (stats.isFile()) {
         const fileObj = path.parse(pathToFile);
         console.log(`
-        ${fileObj.name} - ${fileObj.ext.slice(1)} - ${stats.size}`);
+        ${fileObj.name} - ${fileObj.ext.slice(1)} - ${stats.size / 1024}kb`);
       }
     });
   });
