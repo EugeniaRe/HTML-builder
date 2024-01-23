@@ -39,68 +39,53 @@ fs.mkdir(path.join(__dirname, 'project-dist'), { recursive: true }, (err) => {
 
   projectDist();
 
-  //copy fonts
-  const fontsFolder = path.join(__dirname, 'project-dist', 'assets', 'fonts');
-  fs.mkdir(fontsFolder, { recursive: true }, (err) => {
-    if (err) throw err;
-    fs.readdir(
-      path.join(__dirname, 'assets', 'fonts'),
-      { withFileTypes: true },
-      (err, files) => {
-        files.forEach((file) => {
-          fs.copyFile(
-            `${path.join(file.path, file.name)}`,
-            `${path.join(fontsFolder, file.name)}`,
-            (err) => {
-              if (err) throw err;
-            },
-          );
+  //copy files
+  function copyFiles(fromPath, toPath) {
+    fs.mkdir(toPath, { recursive: true }, (err) => {
+      if (err) throw err;
+      fs.readdir(fromPath,
+        { withFileTypes: true },
+        (err, files) => {
+          files.forEach((file) => {
+            fs.copyFile(
+              `${path.join(file.path, file.name)}`,
+              `${path.join(toPath, file.name)}`,
+              (err) => {
+                if (err) throw err;
+              },
+            );
+          });
+        },
+      );
+    });
+  }
+
+  function checkFolderCopyFiles(fromPath, toPath) {
+    fs.exists(toPath, (ex) => {
+      if (ex) {
+        fs.rm(toPath, { recursive: true }, (err) => {
+          if (err) throw err;
+          copyFiles(fromPath, toPath);
         });
-      },
-    );
-  });
+      } else {
+        copyFiles(fromPath, toPath);
+      }
+    });
+  }
+  //copy fonts
+  const fromFontsFolder = path.join(__dirname, 'assets', 'fonts');
+  const toFontsFolder = path.join(__dirname, 'project-dist', 'assets', 'fonts');
+  checkFolderCopyFiles(fromFontsFolder, toFontsFolder);
 
   //copy images
-  const imgFolder = path.join(__dirname, 'project-dist', 'assets', 'img');
-  fs.mkdir(imgFolder, { recursive: true }, (err) => {
-    if (err) throw err;
-    fs.readdir(
-      path.join(__dirname, 'assets', 'img'),
-      { withFileTypes: true },
-      (err, files) => {
-        files.forEach((file) => {
-          fs.copyFile(
-            `${path.join(file.path, file.name)}`,
-            `${path.join(imgFolder, file.name)}`,
-            (err) => {
-              if (err) throw err;
-            },
-          );
-        });
-      },
-    );
-  });
+  const fromImgFolder = path.join(__dirname, 'assets', 'img');
+  const toImgFolder = path.join(__dirname, 'project-dist', 'assets', 'img');
+  checkFolderCopyFiles(fromImgFolder, toImgFolder);
 
   //copy svg
-  const svgFolder = path.join(__dirname, 'project-dist', 'assets', 'svg');
-  fs.mkdir(svgFolder, { recursive: true }, (err) => {
-    if (err) throw err;
-    fs.readdir(
-      path.join(__dirname, 'assets', 'svg'),
-      { withFileTypes: true },
-      (err, files) => {
-        files.forEach((file) => {
-          fs.copyFile(
-            `${path.join(file.path, file.name)}`,
-            `${path.join(svgFolder, file.name)}`,
-            (err) => {
-              if (err) throw err;
-            },
-          );
-        });
-      },
-    );
-  });
+  const fromSvgFolder = path.join(__dirname, 'assets', 'svg');
+  const toSvgFolder = path.join(__dirname, 'project-dist', 'assets', 'svg');
+  checkFolderCopyFiles(fromSvgFolder, toSvgFolder);
 
   //create style.css file
   const writeStream = fs.createWriteStream(
