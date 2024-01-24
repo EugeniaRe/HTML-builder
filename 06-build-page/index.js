@@ -13,27 +13,18 @@ fs.mkdir(path.join(__dirname, 'project-dist'), { recursive: true }, (err) => {
     await fsPromises
       .readdir(path.join(__dirname, 'components'))
       .then((filenames) => {
-        for (let filename of filenames) {
-          if (path.extname(filename) === '.html') {
-            fs.readFile(
-              path.join(__dirname, 'components', filename),
-              'utf8',
-              (err, data) => {
-                templateData = templateData.replaceAll(
-                  `{{${path.basename(filename, '.html')}}}`,
-                  data,
-                );
-                fs.writeFile(
-                  path.join(__dirname, 'project-dist', 'index.html'),
-                  templateData,
-                  (err) => {
-                    if (err) throw err;
-                  },
-                );
-              },
+
+        filenames.forEach((filename) => {
+          const readComponents = fs.ReadStream(path.join(__dirname, 'components', filename));
+          readComponents.on('data', data => {
+            const writeStreamHTML = fs.createWriteStream(path.join(__dirname, 'project-dist', 'index.html'));
+            templateData = templateData.replaceAll(
+              `{{${path.basename(filename, '.html')}}}`,
+              data,
             );
-          }
-        }
+            writeStreamHTML.write(templateData);
+          })
+        })
       });
   };
 
